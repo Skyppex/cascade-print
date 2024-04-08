@@ -1,4 +1,4 @@
-const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyz 1234567890.:,;!?-_()[]{}/\\'\"@#£¤$%€&*+<=>|~^`´¨";
+const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyz 1234567890.,:;!?-_()[]{}/\\'\"@#£¤$%€&*+<=>|~^`´¨";
 
 fn main() {
     loop {
