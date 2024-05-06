@@ -2,7 +2,7 @@ use clap::{ArgGroup, Parser};
 
 const ALPHABET: &str = "abcdefghijklmnopqrstuvwxyz 1234567890.,:;!?-_()[]{}/\\'\"@#£¤$%€&*+<=>|~^`´¨";
 
-#[derive(Debug, Parser)]
+#[derive(Debug, Parser, Clone)]
 #[command(about, version, author)]
 #[command(group(ArgGroup::new("mode").multiple(false)))]
 pub struct CascadeArgs {
@@ -17,13 +17,17 @@ pub struct CascadeArgs {
     /// The time to sleep between each character in milliseconds (default: 20)
     #[arg(short, long)]
     pub sleep: Option<u64>,
+
+    /// Print the next character immediately instead of looping through the alphabet
+    #[arg(short, long)]
+    pub immediate: bool,
 }
 
 fn main() {
     let args = CascadeArgs::parse();
 
-    if let Some(message) = args.message {
-        cascade_print(&message, args.sleep.unwrap_or(20));
+    if let Some(message) = &args.message {
+        cascade_print(message, args.clone());
         return;
     }
 
@@ -36,7 +40,7 @@ fn main() {
                 continue;
             }
 
-            cascade_print(&input, args.sleep.unwrap_or(20));
+            cascade_print(&input, args.clone());
         }
     }
 
@@ -47,7 +51,7 @@ fn main() {
         return;
     }
 
-    cascade_print(&input, args.sleep.unwrap_or(20));
+    cascade_print(&input, args);
 }
 
 fn get_user_input() -> String {
@@ -59,11 +63,20 @@ fn get_user_input() -> String {
     input.trim().to_owned()
 }
 
-fn cascade_print(input: &str, sleep: u64) {
+fn cascade_print(input: &str, args: CascadeArgs) {
     let input = clean_input(input);
     let mut output = String::new();
 
+    let sleep = args.sleep.unwrap_or(20);
+
     for c in input.chars() {
+        if args.immediate {
+            output.push_str(c.to_string().as_str());
+            println!("{}", output);
+            std::thread::sleep(std::time::Duration::from_millis(sleep));
+            continue;
+        }
+
         for a in ALPHABET.chars() {
             if c.to_lowercase().to_string() == a.to_lowercase().to_string() {
                 output.push_str(c.to_string().as_str());
