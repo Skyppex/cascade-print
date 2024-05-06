@@ -13,13 +13,17 @@ pub struct CascadeArgs {
     /// Whether to loop the program
     #[arg(short, long, group = "mode")]
     pub _loop: bool,
+
+    /// The time to sleep between each character in milliseconds (default: 20)
+    #[arg(short, long)]
+    pub sleep: Option<u64>,
 }
 
 fn main() {
     let args = CascadeArgs::parse();
 
     if let Some(message) = args.message {
-        cascade_print(&message);
+        cascade_print(&message, args.sleep.unwrap_or(20));
         return;
     }
 
@@ -32,7 +36,7 @@ fn main() {
                 continue;
             }
 
-            cascade_print(&input);
+            cascade_print(&input, args.sleep.unwrap_or(20));
         }
     }
 
@@ -43,7 +47,7 @@ fn main() {
         return;
     }
 
-    cascade_print(&input);
+    cascade_print(&input, args.sleep.unwrap_or(20));
 }
 
 fn get_user_input() -> String {
@@ -55,7 +59,7 @@ fn get_user_input() -> String {
     input.trim().to_owned()
 }
 
-fn cascade_print(input: &str) {
+fn cascade_print(input: &str, sleep: u64) {
     let input = clean_input(input);
     let mut output = String::new();
 
@@ -67,11 +71,11 @@ fn cascade_print(input: &str) {
             }
 
             println!("{}{}", output, if c.is_uppercase() { a.to_uppercase().to_string() } else { a.to_string() });
-            std::thread::sleep(std::time::Duration::from_millis(20));
+            std::thread::sleep(std::time::Duration::from_millis(sleep));
         }
 
         println!("{}", output);
-        std::thread::sleep(std::time::Duration::from_millis(20));
+        std::thread::sleep(std::time::Duration::from_millis(sleep));
     }
 }
 
